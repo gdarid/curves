@@ -75,7 +75,7 @@ for c_name, c_params in curves_parameters.items():
 examples_default_name = examples_names[examples_default]
 def_axiom, def_mult_axiom, def_rules, def_rotation_angle, def_starting_angle, def_nb_iter, def_skipped = examples_data[examples_default_name]
 
-st.set_page_config(page_title="LSyst", page_icon="🖼️")
+st.set_page_config(page_title="Curves with L-systems", page_icon="🖼️")
 
 with st.sidebar:
     md_intro = """

@@ -2,7 +2,7 @@
 
 Curves is a Python tool used for generating images with L-systems
 
-There is a streamlit application here : [Curves](https://gdarid-curves.streamlit.app/)
+There is a streamlit application here : [Curves](https://curves.streamlit.app/)
 
 This tool is inspired from [Lindenmayer Systems](https://en.wikipedia.org/wiki/L-system)
 
