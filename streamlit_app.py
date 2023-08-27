@@ -78,13 +78,19 @@ def_axiom, def_mult_axiom, def_rules, def_rotation_angle, def_starting_angle, de
 st.set_page_config(page_title="LSyst", page_icon="🖼️")
 
 with st.sidebar:
-    input_selection = st.selectbox('Choose a starting example', examples_names,
+    md_intro = """
+    You have the flexibility to select a starting example and to change the parameters :sunglasses:
+    """
+
+    st.markdown(md_intro)
+
+    input_selection = st.selectbox('Starting example', examples_names,
                                    index=examples_default, on_change=on_change_selection, key="my_selection")
 
     input_axiom = st.text_input('Starting axiom', def_axiom, key="my_axiom")
     input_mult_axiom = st.number_input('Multiplier for axiom', value=def_mult_axiom, min_value=1, key="my_mult_axiom")
 
-    input_rules = st.text_input('Rules', def_rules, help="Example for 2 rules -> A:  ABC ; B: CAB ;  ", key="my_rules")
+    input_rules = st.text_input('Rules', def_rules, help="Example for 2 rules ->   A:  ABC ;  B:   CAB ; ", key="my_rules")
     input_rotation_angle = st.number_input('Angle of rotation',
                                            value=def_rotation_angle, min_value=1.0, max_value=360.0, step=1.0,
                                            format='%f', key="my_rotation_angle")
@@ -97,7 +103,9 @@ with st.sidebar:
     input_nb_iter = st.number_input('Number of iterations',
                                     value=def_nb_iter, min_value=1, max_value=15, format='%d', key="my_nb_iter")
 
-st.markdown("""**Click on "Draw" when you are satisfied with possible new parameters**""")
+st.markdown("# Curves with L-systems")
+
+st.markdown("""**Click on "Draw" to display the curve**""")
 
 if st.button('Draw') or sv.redraw_auto:
     sv.redraw_auto = False
@@ -112,4 +120,4 @@ if st.button('Draw') or sv.redraw_auto:
             print(exc)
 
 st.markdown("---")
-st.markdown("More infos and :star: at ...")
+st.markdown("More infos and :star: at [github.com/gdarid/curves](https://github.com/gdarid/curves)")
