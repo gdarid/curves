@@ -1,0 +1,116 @@
+
+Dragon:
+    axiom: "FX"
+    axiom_multiplier: 1
+    rules: "X:X+YF+.  ;  Y:-FX-Y"
+    rotation_angle: 90.0
+    nb_iter: 12
+
+Gosper:
+    axiom: "AB"
+    rules: "A: A-B--B+A++AA+B-.  ;  B: +A-BB--B-A++A+B."
+    rotation_angle: 60.0
+    nb_iter: 3
+
+Islands:
+    axiom: "F-F-F-F"
+    rules: "F:F-U+FF-F-FF-FU-FF+U-FF+F+FF+FU+FFF  ;  U:UUUUUU"
+    rotation_angle: 90.0
+    nb_iter: 2
+
+Koch:
+    axiom: "F--F--F"
+    rules: "F:  F+F-.-F+F"
+    rotation_angle: 60.0
+    nb_iter: 6
+
+Minkowski:
+    axiom: "F"
+    rules: "F:  F+F-F-F.F+F+F-F "
+    rotation_angle: 90.0
+    nb_iter: 3
+
+Moore fractal:
+    axiom: "LFL+F+LFL"
+    rules: "L:-RF+LFL+FR-.  ;  R:+LF-RFR-FL+."
+    rotation_angle: 90.0
+    nb_iter: 5
+
+Peano:
+    axiom: "++FA"
+    rules: "A:A-BA+CA+CA+CA-BA-BA-BA+CA.    ;   B:F-F-F-F.   ;   C:F+F+F+F."
+    rotation_angle: 22.5
+    nb_iter: 4
+    skipped: ABC
+
+Penrose tiling:
+    axiom: "[N]++[N]++[N]++[N]++[N]"
+    rules: "M:O++P----N[-O----M]++ ; N:+O--P[---M--N]+ ; O:-M++N[+++O++P]- ; P:--O++++M[+P++++N]--N"
+    rotation_angle: 36.0
+    nb_iter: 5
+
+Pentadendrite:
+    axiom: "F-F-F-F-F"
+    rules: "F:F-F-F+.+F+F-F"
+    rotation_angle: 72.0
+    nb_iter: 4
+
+Polygon with angle 30 degrees:
+    axiom: "F+."
+    rules: ""
+    rotation_angle: 30.0
+    nb_iter: 1
+
+    axiom_multiplier: 12
+
+Polygon with angle 150 degrees:
+    axiom: "F+."
+    rules: ""
+    rotation_angle: 150.0
+    nb_iter: 1
+
+    axiom_multiplier: 12
+
+Polygon 9*5:
+    axiom: "r+"
+    rules: "r: F++F--F--F++F."
+    rotation_angle: 40.0
+    nb_iter: 1
+
+    axiom_multiplier: 9
+
+Returns with angle 5 degrees:
+    axiom: "|+."
+    rules: ""
+    rotation_angle: 5.0
+    nb_iter: 1
+
+    axiom_multiplier: 72
+
+Sierpinsky carpet:
+    axiom: "A"
+    rules: "A:B-A-B.  ;  B:A+B+A."
+    rotation_angle: 60.0
+    nb_iter: 6
+
+Spiral:
+    axiom: "f*+."
+    rules: ""
+    rotation_angle: 10.0
+    nb_iter: 1
+
+    axiom_multiplier: 500
+
+Squigly:
+    axiom: "r"
+    rules: "r: Fr+FL+Fr.  ;  L: FL-Fr-FL"
+    rotation_angle: 60.0
+    nb_iter: 9
+
+Tree:
+    axiom: "F"
+    rules: "F: F[.+FF][.-FF]F[.-F][.+F]F "
+    rotation_angle: 36.0
+    nb_iter: 3
+
+    starting_angle: 90

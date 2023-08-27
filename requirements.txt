@@ -1,0 +1,6 @@
+bokeh
+matplotlib
+numpy
+Pillow
+selenium
+streamlit

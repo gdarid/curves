@@ -1,0 +1,11 @@
+__pycache__
+
+.idea
+
+/_tmp
+
+/images_out/*.html
+/images_out/*.png
+/images_out/*.svg
+
+
