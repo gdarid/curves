@@ -1,12 +1,14 @@
 import lsystc as ls
+import mpld3
 import specific_values as sv
 import streamlit as st
+import streamlit.components.v1 as components
 from streamlit.errors import StreamlitAPIException
 import yaml
 
 
 @st.cache_data
-def load_img(axiom, mult_axiom, rules, rotation_angle, starting_angle, skipped, nb_iterations):
+def load_result(axiom, mult_axiom, rules, rotation_angle, starting_angle, skipped, nb_iterations):
     try:
         rules = rules.strip("; ")
         rules_list = []
@@ -28,7 +30,7 @@ def load_img(axiom, mult_axiom, rules, rotation_angle, starting_angle, skipped, 
         rls.turtle(step=sv.step, angle=rotation_angle, angleinit=starting_angle, coeff=sv.coeff, skipped=skipped,
                    color_length=sv.color_length, color_map=sv.color_map)
 
-        image = rls.render(sv.renderer, save_files=sv.save_files, return_image=True)
+        result = rls.render(sv.renderer, save_files=sv.save_files, return_type=sv.return_type)
     except ValueError as ex:
         st.warning(f"Please verify your parameters - {ex}")
         st.stop()
@@ -37,7 +39,16 @@ def load_img(axiom, mult_axiom, rules, rotation_angle, starting_angle, skipped, 
         print(f"Something went wrong : {ex}")
         st.stop()
     else:
-        return image
+        return result
+
+
+def write_specific(content):
+    try:
+        st.write(content)
+    except StreamlitAPIException as exc:
+        # Currently : streamlit.errors.StreamlitAPIException: `_repr_html_()` is not a valid Streamlit command.
+        if sv.verbose:
+            print(exc)
 
 
 def on_change_selection():
@@ -107,17 +118,20 @@ st.markdown("# Curves with L-systems")
 
 st.markdown("""**Click on "Draw" to display the curve**""")
 
-if st.button('Draw') or sv.redraw_auto:
+if st.button('Draw') or sv.redraw_auto or 'start' not in st.session_state:
     sv.redraw_auto = False
-    img = load_img(input_axiom, input_mult_axiom, input_rules, input_rotation_angle, input_starting_angle,
-                   input_skipped, input_nb_iter)
+    st.session_state['start'] = True
+    res = load_result(input_axiom, input_mult_axiom, input_rules, input_rotation_angle, input_starting_angle,
+                      input_skipped, input_nb_iter)
 
-    try:
-        st.write(st.image(img, caption='Generated image'))
-    except StreamlitAPIException as exc:
-        # Currently : streamlit.errors.StreamlitAPIException: `_repr_html_()` is not a valid Streamlit command.
-        if sv.verbose:
-            print(exc)
+    if sv.return_type == 'image':
+        write_specific(st.image(res, caption='Generated image'))
+    else:
+        # Pyplot figure
+        # write_specific(st.pyplot(res))
+        fig_html = mpld3.fig_to_html(res)
+        components.html(fig_html, height=600)
 
-st.markdown("---")
+
+# st.markdown("---")
 st.markdown("More infos and :star: at [github.com/gdarid/curves](https://github.com/gdarid/curves)")

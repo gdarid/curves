@@ -19,5 +19,9 @@ color_map = "Set1"
 
 # Other
 renderer = 'matplot'  # 'matplot' or 'bokeh'
+return_type = 'figure'  # 'figure' or 'image' -- Beware figure is only possible for the matplot renderer
+if (renderer, return_type) not in [('matplot', 'image'), ('matplot', 'figure'), ('bokeh', 'image')]:
+    raise NotImplementedError("The current combination of renderer and return_type is not implemented")
+
 save_files = False
 verbose = False

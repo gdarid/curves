@@ -1,6 +1,8 @@
 bokeh
 matplotlib
+mpld3
 numpy
 Pillow
+pyyaml
 selenium
 streamlit

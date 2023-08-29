@@ -259,7 +259,7 @@ class Lsystc:
         self.turt = res
 
     def render(self, showtype='matplot', image_destination='images_out/', save_files=True, show_more=False,
-               return_image=False):
+               return_type=''):
         """
         Render self.turt using a specific show type
 
@@ -267,8 +267,8 @@ class Lsystc:
         :param image_destination: folder for images backup
         :param save_files: True to save files
         :param show_more: True to show with specific showtype
-        :param return_image: True to return an image
-        :return: None or an image if return_image is true
+        :param return_type: '', 'image' or 'figure'
+        :return: None or an image if return_type is 'image' or a figure if return_type is 'figure'
         """
         if showtype == 'matplot':
             fig, ax = plt.subplots()
@@ -286,7 +286,7 @@ class Lsystc:
                 fig.savefig(f'{image_destination}plot_{showtype}.png', bbox_inches='tight')
                 fig.savefig(f'{image_destination}plot_{showtype}.svg', bbox_inches='tight')
 
-            if return_image:
+            if return_type == 'image':
                 from PIL import Image
 
                 ax.set_axis_off()
@@ -296,6 +296,11 @@ class Lsystc:
 
                 # Return an image : PIL.Image.Image
                 return Image.frombytes('RGB', fig.canvas.get_width_height(), fig.canvas.tostring_rgb())
+            elif return_type == 'figure':
+                ax.set_axis_off()
+                ax.grid(visible=False)
+
+                return fig
 
         elif showtype == 'bokeh':
             from bokeh.plotting import figure, show, output_file
@@ -322,7 +327,7 @@ class Lsystc:
                 fig.output_backend = "svg"
                 export_svgs(fig, filename=f'{image_destination}plot_{showtype}.svg')
 
-            if return_image:
+            if return_type == 'image':
                 from bokeh.io.export import get_screenshot_as_png
 
                 fig.toolbar_location = None
@@ -331,5 +336,8 @@ class Lsystc:
 
                 # Return an image : PIL.Image.Image
                 return get_screenshot_as_png(fig)
+            elif return_type == 'figure':
+                return fig
+
         else:
             raise ValueError("The given showtype is not correct")

@@ -71,6 +71,22 @@ Polygon with angle 150 degrees:
 
     axiom_multiplier: 12
 
+Polygon with angle 175 degrees:
+    axiom: "F+."
+    rules: ""
+    rotation_angle: 175.0
+    nb_iter: 1
+
+    axiom_multiplier: 72
+
+Polygon with angle 179 degrees:
+    axiom: "F+."
+    rules: ""
+    rotation_angle: 179.0
+    nb_iter: 1
+
+    axiom_multiplier: 360
+
 Polygon 9*5:
     axiom: "r+"
     rules: "r: F++F--F--F++F."
