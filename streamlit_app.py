@@ -133,5 +133,5 @@ if st.button('Draw') or sv.redraw_auto or 'start' not in st.session_state:
         components.html(fig_html, height=600)
 
 
-# st.markdown("---")
+st.markdown("---")
 st.markdown("More infos and :star: at [github.com/gdarid/curves](https://github.com/gdarid/curves)")
