@@ -1,8 +1,10 @@
 bokeh
+kaleido
 matplotlib
 mpld3
 numpy
 Pillow
+plotly
 pyyaml
 selenium
 streamlit

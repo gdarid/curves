@@ -18,10 +18,13 @@ color_length = 3
 color_map = "Set1"
 
 # Other
-renderer = 'matplot'  # 'matplot' or 'bokeh'
-return_type = 'figure'  # 'figure' or 'image' -- Beware figure is only possible for the matplot renderer
-if (renderer, return_type) not in [('matplot', 'image'), ('matplot', 'figure'), ('bokeh', 'image')]:
+renderer = 'plotly'  # 'matplot' or 'bokeh' or 'plotly'
+return_type = 'figure'  # 'figure' or 'image'
+if (renderer, return_type) not in [('matplot', 'image'), ('matplot', 'figure'),
+                                   ('plotly', 'image'), ('plotly', 'figure'),
+                                   ('bokeh', 'image')]:
     raise NotImplementedError("The current combination of renderer and return_type is not implemented")
 
 save_files = False
 verbose = False
+show_more = False  # Set to true to see more details "locally"

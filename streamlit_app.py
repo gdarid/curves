@@ -30,7 +30,7 @@ def load_result(axiom, mult_axiom, rules, rotation_angle, starting_angle, skippe
         rls.turtle(step=sv.step, angle=rotation_angle, angleinit=starting_angle, coeff=sv.coeff, skipped=skipped,
                    color_length=sv.color_length, color_map=sv.color_map)
 
-        result = rls.render(sv.renderer, save_files=sv.save_files, return_type=sv.return_type)
+        result = rls.render(sv.renderer, save_files=sv.save_files, show_more=sv.show_more, return_type=sv.return_type)
     except ValueError as ex:
         st.warning(f"Please verify your parameters - {ex}")
         st.stop()
@@ -127,11 +127,15 @@ if st.button('Draw') or sv.redraw_auto or 'start' not in st.session_state:
     if sv.return_type == 'image':
         write_specific(st.image(res, caption='Generated image'))
     else:
-        # Pyplot figure
-        # write_specific(st.pyplot(res))
-        fig_html = mpld3.fig_to_html(res)
-        components.html(fig_html, height=600)
-
+        if sv.renderer == 'matplot':
+            # Pyplot figure
+            # write_specific(st.pyplot(res))
+            fig_html = mpld3.fig_to_html(res)
+            components.html(fig_html, height=600)
+        elif sv.renderer == 'bokeh':
+            st.bokeh_chart(res, use_container_width=True)
+        elif sv.renderer == 'plotly':
+            st.plotly_chart(res, use_container_width=True)
 
 st.markdown("---")
 st.markdown("More infos and :star: at [github.com/gdarid/curves](https://github.com/gdarid/curves)")

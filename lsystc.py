@@ -11,6 +11,7 @@ See also
 import math
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import io
 
 
 class Lsystc:
@@ -258,56 +259,52 @@ class Lsystc:
 
         self.turt = res
 
-    def render(self, showtype='matplot', image_destination='images_out/', save_files=True, show_more=False,
+    def render(self, show_type='matplot', image_destination='images_out/', save_files=True, show_more=False,
                return_type=''):
         """
         Render self.turt using a specific show type
 
-        :param showtype: 'matplot' or 'bokeh'
+        :param show_type: 'matplot' or 'bokeh'
         :param image_destination: folder for images backup
         :param save_files: True to save files
-        :param show_more: True to show with specific showtype
+        :param show_more: True to show with specific show_type
         :param return_type: '', 'image' or 'figure'
         :return: None or an image if return_type is 'image' or a figure if return_type is 'figure'
         """
-        if showtype == 'matplot':
+        if show_type == 'matplot':
             fig, ax = plt.subplots()
 
             for (lx, ly, coul) in self.turt:
                 r, g, b = coul
                 ax.plot(lx, ly, color=(r / 255., g / 255., b / 255., 1.0))
 
+            ax.set_axis_off()
+            ax.grid(visible=False)
+
             if show_more:
                 plt.show()
 
             if save_files:
-                ax.set_axis_off()
-                ax.grid(visible=False)
-                fig.savefig(f'{image_destination}plot_{showtype}.png', bbox_inches='tight')
-                fig.savefig(f'{image_destination}plot_{showtype}.svg', bbox_inches='tight')
+                fig.savefig(f'{image_destination}plot_{show_type}.png', bbox_inches='tight')
+                fig.savefig(f'{image_destination}plot_{show_type}.svg', bbox_inches='tight')
 
             if return_type == 'image':
                 from PIL import Image
 
-                ax.set_axis_off()
-                ax.grid(visible=False)
                 fig.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0, hspace=0)
                 fig.canvas.draw()
 
                 # Return an image : PIL.Image.Image
                 return Image.frombytes('RGB', fig.canvas.get_width_height(), fig.canvas.tostring_rgb())
             elif return_type == 'figure':
-                ax.set_axis_off()
-                ax.grid(visible=False)
-
                 return fig
 
-        elif showtype == 'bokeh':
+        elif show_type == 'bokeh':
             from bokeh.plotting import figure, show, output_file
             from bokeh.io import export_png, export_svgs
 
             if save_files:
-                output_file(f'{image_destination}lines_{showtype}.html')
+                output_file(f'{image_destination}lines_{show_type}.html')
 
             fig = figure(title="LSyst", x_axis_label='x', y_axis_label='y', width=800, height=800)
 
@@ -322,10 +319,10 @@ class Lsystc:
                 _ = show(fig)
 
             if save_files:
-                export_png(fig, filename=f'{image_destination}plot_{showtype}.png')
+                export_png(fig, filename=f'{image_destination}plot_{show_type}.png')
 
                 fig.output_backend = "svg"
-                export_svgs(fig, filename=f'{image_destination}plot_{showtype}.svg')
+                export_svgs(fig, filename=f'{image_destination}plot_{show_type}.svg')
 
             if return_type == 'image':
                 from bokeh.io.export import get_screenshot_as_png
@@ -339,5 +336,54 @@ class Lsystc:
             elif return_type == 'figure':
                 return fig
 
+        elif show_type == 'plotly':
+            import plotly.graph_objects as go
+
+            fig = go.Figure()
+
+            index = 0
+            for (lx, ly, coul) in self.turt:
+                index += 1
+                cr, cg, cb = coul
+                fig.add_trace(go.Scatter(x=lx, y=ly, mode='lines',
+                                         name=f"t{index}", line=dict(color=f'rgb({cr},{cg},{cb})', width=1)))
+
+            fig.update_layout(
+                xaxis=dict(
+                    showline=True,
+                    showgrid=False,
+                    showticklabels=True,
+                    zeroline=False,
+                    ticks='outside',
+                ),
+                yaxis=dict(
+                    showline=True,
+                    showgrid=False,
+                    showticklabels=True,
+                    zeroline=False,
+                    ticks='outside',
+                ),
+                autosize=True,
+                showlegend=False
+            )
+
+            if show_more:
+                fig.show()
+
+            if save_files:
+                fig.write_image(f'{image_destination}plot_{show_type}.png')
+                fig.write_image(f'{image_destination}plot_{show_type}.svg')
+
+            if return_type == 'image':
+                from PIL import Image
+
+                fig_bytes = fig.to_image(format="png")
+                buf = io.BytesIO(fig_bytes)
+
+                # Return an image : PIL.Image.Image
+                return Image.open(buf)
+            elif return_type == 'figure':
+                return fig
+
         else:
-            raise ValueError("The given showtype is not correct")
+            raise ValueError("The given show_type is not correct")
