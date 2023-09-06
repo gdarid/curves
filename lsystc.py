@@ -18,7 +18,7 @@ class Lsystc:
     """
     Classic L-System with few customizations
     """
-    def __init__(self, axiom, rules, nbiter, dev_ini=True):
+    def __init__(self, axiom: str, rules: list[tuple[str, str]], nbiter: int, dev_ini: bool = True) -> None:
         self.axiom = axiom
         self.rules = rules
         self.nbiter = nbiter
@@ -41,7 +41,7 @@ class Lsystc:
             self.develop()
 
     @staticmethod
-    def dev_unit(source, regles):
+    def dev_unit(source: str, regles: list[tuple[str, str]]) -> str:
         """
         Develop source with regles
         """
@@ -68,14 +68,7 @@ class Lsystc:
         return result
 
     @staticmethod
-    def ls_simplifie(chaine, skipped):
-        """
-        Returns a simplified string where all "skipped" characters are removed
-        """
-        return [car for car in chaine if car not in skipped]
-
-    @staticmethod
-    def color_from_map(name, index):
+    def color_from_map(name: str, index: int) -> tuple[int, int, int]:
         """
         :param name: name of the discrete colormap (matplotlib source) to be used
         :param index: index of the color in the map
@@ -87,9 +80,14 @@ class Lsystc:
         return r, g, b
 
     @staticmethod
-    def new_pos(ax, ay, astep, aangle):
+    def new_pos(ax: float, ay: float, astep: float, aangle: float) -> tuple[float, float]:
         """
         New position from (ax, ay) with the use of astep and aangle
+
+        :param ax: 1st coordinate of starting point
+        :param ay: 2nd coordinate of starting point
+        :param astep: step size
+        :param aangle: step angle
         """
         if aangle == 0.0:
             lx = ax + astep
@@ -109,7 +107,7 @@ class Lsystc:
 
         return lx, ly
 
-    def develop(self):
+    def develop(self) -> None:
         """
         Develop self.axiom from the list of rules (self.rules) with nbiter iterations
 
@@ -131,20 +129,20 @@ class Lsystc:
 
         self.dev = result
 
-    def turtle(self, step=10.0, angle=90.0, angleinit=0.0, coeff=1.1,
-               angle2=10.0, skipped='', color_length=3, color_map="Set1"):
+    def turtle(self, step: float = 10.0, angle: float = 90.0, angleinit: float = 0.0, coeff: float = 1.1,
+               angle2: float = 10.0, skipped: str = '', color_length: int = 3, color_map: str = "Set1") -> None:
         """
         Develop self.dev in [(lx, ly, color),...] where lx and ly are lists of positions
         The result goes to self.turt
 
-        step : the turtle size
-        angle : angle of rotation (in degrees)     ( + - )
-        angleinit : initial angle
-        coeff : magnification or reduction factor for the step ( * / ) and factor for "lowered" characters
-        angle2 : 2nd usable angle ( < > )
-        skipped : skipped characters
-        color_length : maximal number of colours
-        color_map : color map to use (matplotlib name)
+        :param step: the turtle step size
+        :param angle: angle of rotation (in degrees)     ( + - )
+        :param angleinit: initial angle
+        :param coeff: magnification or reduction factor for the step ( * / ) and factor for "lowered" characters
+        :param angle2: 2nd usable angle ( < > )
+        :param skipped: skipped characters
+        :param color_length: maximal number of colours
+        :param color_map: color map to use (matplotlib name)
 
         """
         if skipped:
@@ -259,8 +257,9 @@ class Lsystc:
 
         self.turt = res
 
-    def render(self, show_type='matplot', image_destination='images_out/', save_files=True, show_more=False,
-               return_type=''):
+    def render(self, show_type: str = 'matplot', image_destination: str = 'images_out/',
+               save_files: bool = True, show_more: bool = False,
+               return_type: str = ''):
         """
         Render self.turt using a specific show type
 
