@@ -12,6 +12,12 @@ Gosper:
     rotation_angle: 60.0
     nb_iter: 3
 
+Icy:
+    axiom: "F+F+F+F"
+    rules: "F:  FF+F++.F+F "
+    rotation_angle: 90.0
+    nb_iter: 5
+
 Islands:
     axiom: "F-F-F-F"
     rules: "F:F-U+FF-F-FF-FU-FF+U-FF+F+FF+FU+FFF  ;  U:UUUUUU"
