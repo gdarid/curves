@@ -12,6 +12,13 @@ Gosper:
     rotation_angle: 60.0
     nb_iter: 3
 
+Hilbert:
+    axiom: "L"
+    rules: "L:-RF+LFL+FR-.  ;  R:+LF-RFR-FL+."
+    rotation_angle: 90.0
+    nb_iter: 5
+    skipped: LR
+
 Icy:
     axiom: "F+F+F+F"
     rules: "F:  FF+F++.F+F "
@@ -35,12 +42,6 @@ Minkowski:
     rules: "F:  F+F-F-F.F+F+F-F "
     rotation_angle: 90.0
     nb_iter: 3
-
-Moore fractal:
-    axiom: "LFL+F+LFL"
-    rules: "L:-RF+LFL+FR-.  ;  R:+LF-RFR-FL+."
-    rotation_angle: 90.0
-    nb_iter: 5
 
 Peano:
     axiom: "++FA"

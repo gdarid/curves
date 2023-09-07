@@ -33,7 +33,7 @@ class Lsystc:
         self.char_color = '.'
         self.char_up_move = 'UVW'
         self.char_move_angle_init = '_'
-        self.char_move = 'ABCDEFGHIJLMNOP'
+        self.char_move = 'ABCDEFGHIJKLMNOPQRST'
         self.char_move_multi = self.char_move.lower()
         self.char_move_all = self.char_color + self.char_up_move + self.char_move_angle_init + self.char_move_multi + self.char_move
 
@@ -220,6 +220,8 @@ class Lsystc:
             elif car == '!':
                 # Change the sens of rotation
                 tsens = tsens * -1
+            else:
+                continue
 
             # Take into account the read character
             # ------------------------------------
