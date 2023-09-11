@@ -28,3 +28,4 @@ if (renderer, return_type) not in [('matplot', 'image'), ('matplot', 'figure'),
 save_files = False
 verbose = False
 show_more = False  # Set to true to see more details "locally"
+show_3d = False

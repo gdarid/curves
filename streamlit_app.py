@@ -30,7 +30,8 @@ def load_result(axiom, mult_axiom, rules, rotation_angle, starting_angle, skippe
         rls.turtle(step=sv.step, angle=rotation_angle, angleinit=starting_angle, coeff=sv.coeff, skipped=skipped,
                    color_length=sv.color_length, color_map=sv.color_map)
 
-        result = rls.render(sv.renderer, save_files=sv.save_files, show_more=sv.show_more, return_type=sv.return_type)
+        result = rls.render(sv.renderer, save_files=sv.save_files, show_more=sv.show_more, show_3d=sv.show_3d,
+                            return_type=sv.return_type)
     except ValueError as ex:
         st.warning(f"Please verify your parameters - {ex}")
         st.stop()

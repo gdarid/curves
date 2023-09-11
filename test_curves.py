@@ -21,11 +21,20 @@ def test_more_iterations(axiom, rules, nbiterations, expected_result):
 
 
 @pytest.mark.parametrize("axiom, expected_result", [
-    ('F', [([0, 10], [0, 0], (228, 26, 28))]),
-    ('F+F', [([0, 10, 10], [0, 0, 10], (228, 26, 28))]),
+    ('F', [([0, 10], [0, 0], [0, 0], (228, 26, 28))]),
+    ('F+F', [([0, 10, 10], [0, 0, 10], [0, 0, 0], (228, 26, 28))]),
 ])
 def test_turt(axiom, expected_result):
     syst = ls.Lsystc(axiom, [], nbiter=1)
     syst.turtle()
     assert syst.turt == expected_result
 
+
+@pytest.mark.parametrize("axiom, expected_result", [
+    ('⇧F', [([0, 0, 10], [0, 0, 0], [0, 10, 10], (228, 26, 28))]),
+    ('⇩F', [([0, 0, 10], [0, 0, 0], [0, -10, -10], (228, 26, 28))]),
+])
+def test_turt_3d(axiom, expected_result):
+    syst = ls.Lsystc(axiom, [], nbiter=1)
+    syst.turtle()
+    assert syst.turt == expected_result

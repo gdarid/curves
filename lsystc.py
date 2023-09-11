@@ -31,11 +31,17 @@ class Lsystc:
         self.default_skipped = ' '
 
         self.char_color = '.'
-        self.char_up_move = 'UVW'
+        self.char_move_lifted_pen = 'UVW'
         self.char_move_angle_init = '_'
         self.char_move = 'ABCDEFGHIJKLMNOPQRST'
         self.char_move_multi = self.char_move.lower()
-        self.char_move_all = self.char_color + self.char_up_move + self.char_move_angle_init + self.char_move_multi + self.char_move
+        self.char_move_all = (self.char_color + self.char_move_lifted_pen + self.char_move_angle_init +
+                              self.char_move_multi + self.char_move)
+
+        self.char_move_up_3d = '⇧'
+        self.char_move_down_3d = '⇩'
+
+        self.dimension = 2
 
         if dev_ini:
             self.develop()
@@ -132,7 +138,7 @@ class Lsystc:
     def turtle(self, step: float = 10.0, angle: float = 90.0, angleinit: float = 0.0, coeff: float = 1.1,
                angle2: float = 10.0, skipped: str = '', color_length: int = 3, color_map: str = "Set1") -> None:
         """
-        Develop self.dev in [(lx, ly, color),...] where lx and ly are lists of positions
+        Develop self.dev in [(lx, ly, lz, color),...] where lx, ly, lz are lists of positions
         The result goes to self.turt
 
         :param step: the turtle step size
@@ -150,19 +156,19 @@ class Lsystc:
         else:
             skipped = self.default_skipped
 
-        # print('Simplified string : ', self.ls_simplifie(self.dev, skipped))
-
         res = []
-        stock = []  # List of (point, angle) kept for [] et ()
+        stock = []  # List of ("point", angle) kept for [] et ()
 
         lix = [0.0]
         liy = [0.0]
+        liz = [0.0]
+
         tx = 0.0
         ty = 0.0
+        tz = 0.0
         tstep = step
         tangle = angleinit
         tsens = 1
-        ncolor = False
         color_index = 0
         tcouleur = self.color_from_map(color_map, color_index)
 
@@ -195,7 +201,14 @@ class Lsystc:
                 npos = (car in self.char_move + self.char_move_multi + self.char_move_angle_init)
 
                 # nliste true <-> new list because of a change of color or a raised pen
-                nliste = (car in self.char_color + self.char_up_move)
+                nliste = (car in self.char_color + self.char_move_lifted_pen)
+            elif car in self.char_move_up_3d or car in self.char_move_down_3d:
+                npos = True
+                self.dimension = 3
+                if car in self.char_move_up_3d:
+                    tz += tstep
+                else:
+                    tz -= tstep
             elif car in '+':
                 tangle = (tangle + angle * tsens) % 360.0
             elif car in '-':
@@ -209,10 +222,10 @@ class Lsystc:
             elif car == '/':
                 tstep /= coeff
             elif car in '[(':
-                stock.append((tx, ty, tangle))
+                stock.append((tx, ty, tz, tangle, tcouleur))
             elif car in '])':
                 if stock:
-                    tx, ty, tangle = stock.pop()
+                    tx, ty, tz, tangle, tcouleur = stock.pop()
                     nliste = True  # the pen is raised to go back to the stocked position
             elif car == '|':
                 # Single "return" ("round-trip")
@@ -233,34 +246,35 @@ class Lsystc:
                     tcouleur = self.color_from_map(color_map, color_index)
 
                 if len(lix) > 1:
-                    res.append((lix, liy, tcouleur))
+                    res.append((lix, liy, liz, tcouleur))
                 lix = [tx]
                 liy = [ty]
+                liz = [tz]
             elif npos:
                 # New position and no new list
                 lix.append(tx)
                 liy.append(ty)
+                liz.append(tz)
             elif npospos:
                 # 2 new positions for a "round-trip"
                 tnx, tny = self.new_pos(tx, ty, tstep, tangle)
 
                 lix.append(tnx)
                 liy.append(tny)
+                liz.append(tz)
 
                 lix.append(tx)
                 liy.append(ty)
+                liz.append(tz)
 
         if len(lix) > 1:
-            if ncolor:
-                # Change of color
-                color_index = (color_index + 1) % color_length
-                tcouleur = self.color_from_map(color_map, color_index)
-            res.append((lix, liy, tcouleur))
+            # Finally, append the last points
+            res.append((lix, liy, liz, tcouleur))
 
         self.turt = res
 
     def render(self, show_type: str = 'matplot', image_destination: str = 'images_out/',
-               save_files: bool = True, show_more: bool = False,
+               save_files: bool = True, show_more: bool = False, show_3d: bool = False,
                return_type: str = ''):
         """
         Render self.turt using a specific show type
@@ -269,13 +283,14 @@ class Lsystc:
         :param image_destination: folder for images backup
         :param save_files: True to save files
         :param show_more: True to show with specific show_type
+        :param show_3d: True to show 3D (implemented with plotly only)
         :param return_type: '', 'image' or 'figure'
         :return: None or an image if return_type is 'image' or a figure if return_type is 'figure'
         """
         if show_type == 'matplot':
             fig, ax = plt.subplots()
 
-            for (lx, ly, coul) in self.turt:
+            for (lx, ly, _, coul) in self.turt:
                 r, g, b = coul
                 ax.plot(lx, ly, color=(r / 255., g / 255., b / 255., 1.0))
 
@@ -309,7 +324,7 @@ class Lsystc:
 
             fig = figure(title="LSyst", x_axis_label='x', y_axis_label='y', width=800, height=800)
 
-            for (lx, ly, coul) in self.turt:
+            for (lx, ly, _, coul) in self.turt:
                 cr, cg, cb = coul
                 fig.line(lx, ly, line_color=(cr, cg, cb))
 
@@ -342,28 +357,34 @@ class Lsystc:
 
             fig = go.Figure()
 
+            axis_dict = dict(
+                showline=True,
+                showgrid=False,
+                showticklabels=True,
+                zeroline=False,
+                ticks='outside',
+            )
+
             index = 0
-            for (lx, ly, coul) in self.turt:
-                index += 1
-                cr, cg, cb = coul
-                fig.add_trace(go.Scatter(x=lx, y=ly, mode='lines',
-                                         name=f"t{index}", line=dict(color=f'rgb({cr},{cg},{cb})', width=1)))
+
+            if self.dimension == 2 or not show_3d:
+                for (lx, ly, lz, coul) in self.turt:
+                    index += 1
+                    cr, cg, cb = coul
+                    fig.add_trace(go.Scatter(x=lx, y=ly, mode='lines',
+                                             name=f"t{index}", line=dict(color=f'rgb({cr},{cg},{cb})', width=1)))
+
+            else:
+                # 3D
+                for (lx, ly, lz, coul) in self.turt:
+                    index += 1
+                    cr, cg, cb = coul
+                    fig.add_trace(go.Scatter3d(x=lx, y=ly, z=lz, mode='lines',
+                                               name=f"t{index}", line=dict(color=f'rgb({cr},{cg},{cb})', width=1)))
 
             fig.update_layout(
-                xaxis=dict(
-                    showline=True,
-                    showgrid=False,
-                    showticklabels=True,
-                    zeroline=False,
-                    ticks='outside',
-                ),
-                yaxis=dict(
-                    showline=True,
-                    showgrid=False,
-                    showticklabels=True,
-                    zeroline=False,
-                    ticks='outside',
-                ),
+                xaxis=axis_dict,
+                yaxis=axis_dict,
                 autosize=True,
                 showlegend=False
             )
