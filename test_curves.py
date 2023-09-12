@@ -38,3 +38,13 @@ def test_turt_3d(axiom, expected_result):
     syst = ls.Lsystc(axiom, [], nbiter=1)
     syst.turtle()
     assert syst.turt == expected_result
+
+
+@pytest.mark.parametrize("axiom, expected_result", [
+    ('uF', [([0, 10.1], [0, 0], [0, 0], (228, 26, 28))]),
+    ('vF', [([0, 9.9], [0, 0], [0, 0], (228, 26, 28))]),
+])
+def test_turt_delta(axiom, expected_result):
+    syst = ls.Lsystc(axiom, [], nbiter=1)
+    syst.turtle()
+    assert syst.turt == expected_result

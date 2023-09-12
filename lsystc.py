@@ -47,9 +47,9 @@ class Lsystc:
             self.develop()
 
     @staticmethod
-    def dev_unit(source: str, regles: list[tuple[str, str]]) -> str:
+    def dev_unit(source: str, rules: list[tuple[str, str]]) -> str:
         """
-        Develop source with regles
+        Develop source with rules
         """
         result = source
         position = 0
@@ -58,7 +58,7 @@ class Lsystc:
         while True:
             # The leftmost usable rule is applied
             newpos = None
-            for lr, regle in enumerate(regles):
+            for lr, regle in enumerate(rules):
                 lpos = result.find(regle[0], position)
                 if lpos >= 0:
                     if newpos is None or lpos < newpos:
@@ -68,8 +68,8 @@ class Lsystc:
             if newpos is None:
                 break
             else:
-                result = result[0:newpos] + result[newpos:].replace(regles[lreg][0], regles[lreg][1], 1)
-                position = newpos + len(regles[lreg][1])
+                result = result[0:newpos] + result[newpos:].replace(rules[lreg][0], rules[lreg][1], 1)
+                position = newpos + len(rules[lreg][1])
 
         return result
 
@@ -136,7 +136,8 @@ class Lsystc:
         self.dev = result
 
     def turtle(self, step: float = 10.0, angle: float = 90.0, angleinit: float = 0.0, coeff: float = 1.1,
-               angle2: float = 10.0, skipped: str = '', color_length: int = 3, color_map: str = "Set1") -> None:
+               angle2: float = 10.0, skipped: str = '', color_length: int = 3, color_map: str = "Set1",
+               delta: float = 0.1, char_delta_add: str = 'u', char_delta_sub: str = 'v') -> None:
         """
         Develop self.dev in [(lx, ly, lz, color),...] where lx, ly, lz are lists of positions
         The result goes to self.turt
@@ -149,7 +150,9 @@ class Lsystc:
         :param skipped: skipped characters
         :param color_length: maximal number of colours
         :param color_map: color map to use (matplotlib name)
-
+        :param delta: value to add to the step
+        :param char_delta_add: characters to add the delta value to the step
+        :param char_delta_sub: characters to subtract the delta value to the step
         """
         if skipped:
             skipped = skipped + self.default_skipped
@@ -221,11 +224,15 @@ class Lsystc:
                 tstep *= coeff
             elif car == '/':
                 tstep /= coeff
+            elif car in char_delta_add:
+                tstep += delta
+            elif car in char_delta_sub:
+                tstep -= delta
             elif car in '[(':
-                stock.append((tx, ty, tz, tangle, tcouleur))
+                stock.append((tx, ty, tz, tangle, tcouleur, tstep))
             elif car in '])':
                 if stock:
-                    tx, ty, tz, tangle, tcouleur = stock.pop()
+                    tx, ty, tz, tangle, tcouleur, tstep = stock.pop()
                     nliste = True  # the pen is raised to go back to the stocked position
             elif car == '|':
                 # Single "return" ("round-trip")

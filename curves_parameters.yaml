@@ -116,8 +116,16 @@ Sierpinsky carpet:
     rotation_angle: 60.0
     nb_iter: 6
 
-Spiral:
-    axiom: "f*+."
+Spiral 1:
+    axiom: "F*+."
+    rules: ""
+    rotation_angle: 10.0
+    nb_iter: 1
+
+    axiom_multiplier: 500
+
+Spiral 2:
+    axiom: "Fu+."
     rules: ""
     rotation_angle: 10.0
     nb_iter: 1
