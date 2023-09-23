@@ -117,7 +117,7 @@ Sierpinsky carpet:
     nb_iter: 6
 
 Spiral 1:
-    axiom: "F*+."
+    axiom: "Fu+."
     rules: ""
     rotation_angle: 10.0
     nb_iter: 1
@@ -125,7 +125,7 @@ Spiral 1:
     axiom_multiplier: 500
 
 Spiral 2:
-    axiom: "Fu+."
+    axiom: "F*+."
     rules: ""
     rotation_angle: 10.0
     nb_iter: 1
