@@ -6,6 +6,8 @@ import streamlit.components.v1 as components
 from streamlit.errors import StreamlitAPIException
 import yaml
 
+st.set_page_config(page_title="Curves with L-systems", page_icon="🖼️", layout="wide")
+
 
 @st.cache_data
 def load_result(axiom, mult_axiom, rules, rotation_angle, starting_angle, skipped, nb_iterations):
@@ -86,8 +88,6 @@ for c_name, c_params in curves_parameters.items():
 
 examples_default_name = examples_names[examples_default]
 def_axiom, def_mult_axiom, def_rules, def_rotation_angle, def_starting_angle, def_nb_iter, def_skipped = examples_data[examples_default_name]
-
-st.set_page_config(page_title="Curves with L-systems", page_icon="🖼️")
 
 with st.sidebar:
     md_intro = """
