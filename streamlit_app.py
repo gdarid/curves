@@ -1,3 +1,4 @@
+from loguru import logger
 import lsystc as ls
 import mpld3
 import specific_values as sv
@@ -39,7 +40,7 @@ def load_result(axiom, mult_axiom, rules, rotation_angle, starting_angle, skippe
         st.stop()
     except Exception as ex:
         st.warning(f"Please verify your parameters")
-        print(f"Something went wrong : {ex}")
+        logger.error(f"Something went wrong : {ex}")
         st.stop()
     else:
         return result
@@ -51,7 +52,7 @@ def write_specific(content):
     except StreamlitAPIException as exc:
         # Currently : streamlit.errors.StreamlitAPIException: `_repr_html_()` is not a valid Streamlit command.
         if sv.verbose:
-            print(exc)
+            logger.error(exc)
 
 
 def on_change_selection():
