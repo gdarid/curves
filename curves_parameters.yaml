@@ -116,6 +116,15 @@ Sierpinsky carpet:
     rotation_angle: 60.0
     nb_iter: 6
 
+Spider:
+    axiom: "F*+."
+    rules: ""
+    rotation_angle: 61.0
+    nb_iter: 1
+
+    axiom_multiplier: 500
+    coeff: 0.99
+
 Spiral 1:
     axiom: "Fu+."
     rules: ""
@@ -131,6 +140,16 @@ Spiral 2:
     nb_iter: 1
 
     axiom_multiplier: 500
+    coeff: 1.01
+
+Spiral 3:
+    axiom: "F*+."
+    rules: ""
+    rotation_angle: 10.0
+    nb_iter: 1
+
+    axiom_multiplier: 500
+    coeff: -1.01
 
 Squigly:
     axiom: "r"
@@ -145,3 +164,12 @@ Tree:
     nb_iter: 3
 
     starting_angle: 90
+
+Triangle with spiral:
+    axiom: "F*+."
+    rules: ""
+    rotation_angle: 122.0
+    nb_iter: 1
+
+    axiom_multiplier: 500
+    coeff: 0.94

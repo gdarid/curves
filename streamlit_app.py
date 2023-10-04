@@ -11,7 +11,7 @@ st.set_page_config(page_title="Curves with L-systems", page_icon="🖼️", layo
 
 
 @st.cache_data
-def load_result(axiom, mult_axiom, rules, rotation_angle, starting_angle, skipped, nb_iterations):
+def load_result(axiom, mult_axiom, rules, rotation_angle, starting_angle, skipped, nb_iterations, coeff):
     try:
         rules = rules.strip("; ")
         rules_list = []
@@ -30,7 +30,7 @@ def load_result(axiom, mult_axiom, rules, rotation_angle, starting_angle, skippe
                     raise ValueError(f"Every non empty rule must include a column character ( {item} ) ")
 
         rls = ls.Lsystc(axiom * mult_axiom, rules_list, nbiter=nb_iterations)
-        rls.turtle(step=sv.step, angle=rotation_angle, angleinit=starting_angle, coeff=sv.coeff, skipped=skipped,
+        rls.turtle(step=sv.step, angle=rotation_angle, angleinit=starting_angle, coeff=coeff, skipped=skipped,
                    color_length=sv.color_length, color_map=sv.color_map)
 
         result = rls.render(sv.renderer, save_files=sv.save_files, show_more=sv.show_more, show_3d=sv.show_3d,
@@ -57,7 +57,7 @@ def write_specific(content):
 
 def on_change_selection():
     current_selection = st.session_state.my_selection
-    axiom, mult_axiom, rules, rotation_angle, starting_angle, nb_iter, skipped = examples_data[current_selection]
+    axiom, mult_axiom, rules, rotation_angle, starting_angle, nb_iter, skipped, coeff = examples_data[current_selection]
     st.session_state.my_axiom = axiom
     st.session_state.my_mult_axiom = mult_axiom
     st.session_state.my_rules = rules
@@ -65,6 +65,7 @@ def on_change_selection():
     st.session_state.my_starting_angle = starting_angle
     st.session_state.my_nb_iter = nb_iter
     st.session_state.my_skipped = skipped
+    st.session_state.my_coeff = coeff
     sv.redraw_auto = True
 
 
@@ -83,12 +84,13 @@ for c_name, c_params in curves_parameters.items():
     c_starting_angle = c_params.get('starting_angle', 0)
     c_nb_iter = c_params.get('nb_iter', 1)
     c_skipped = c_params.get('skipped', '')
+    c_coeff = c_params.get('coeff', 1.0)
     examples_data[c_name] = (c_axiom, c_axiom_multiplier, c_rules,
-                             c_rotation_angle, c_starting_angle, c_nb_iter, c_skipped)
+                             c_rotation_angle, c_starting_angle, c_nb_iter, c_skipped, c_coeff)
 
 
 examples_default_name = examples_names[examples_default]
-def_axiom, def_mult_axiom, def_rules, def_rotation_angle, def_starting_angle, def_nb_iter, def_skipped = examples_data[examples_default_name]
+def_axiom, def_mult_axiom, def_rules, def_rotation_angle, def_starting_angle, def_nb_iter, def_skipped, def_coeff = examples_data[examples_default_name]
 
 with st.sidebar:
     md_intro = """
@@ -113,6 +115,9 @@ with st.sidebar:
 
     input_skipped = st.text_input('Skipped characters', def_skipped, key="my_skipped")
 
+    input_coeff = st.number_input('Coefficient',
+                                  value=def_coeff, format='%f', key="my_coeff")
+
     input_nb_iter = st.number_input('Number of iterations',
                                     value=def_nb_iter, min_value=1, max_value=15, format='%d', key="my_nb_iter")
 
@@ -124,7 +129,7 @@ if st.button('Draw') or sv.redraw_auto or 'start' not in st.session_state:
     sv.redraw_auto = False
     st.session_state['start'] = True
     res = load_result(input_axiom, input_mult_axiom, input_rules, input_rotation_angle, input_starting_angle,
-                      input_skipped, input_nb_iter)
+                      input_skipped, input_nb_iter, input_coeff)
 
     if sv.return_type == 'image':
         write_specific(st.image(res, caption='Generated image'))
@@ -141,3 +146,4 @@ if st.button('Draw') or sv.redraw_auto or 'start' not in st.session_state:
 
 st.markdown("---")
 st.markdown("More infos and :star: at [github.com/gdarid/curves](https://github.com/gdarid/curves)")
+st.markdown("More details on Lindenmayer systems here : [Wikipedia](https://en.wikipedia.org/wiki/L-system)")

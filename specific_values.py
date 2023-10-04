@@ -10,7 +10,6 @@ The possible color maps are
 redraw_auto = True
 
 # Turtle parameters
-coeff = 1.02
 step = 10.0
 
 # Number of the maximum of colors and color map
