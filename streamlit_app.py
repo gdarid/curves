@@ -1,17 +1,33 @@
+"""
+Streamlit application
+"""
 from loguru import logger
-import lsystc as ls
 import mpld3
-import specific_values as sv
 import streamlit as st
 import streamlit.components.v1 as components
 from streamlit.errors import StreamlitAPIException
 import yaml
+import lsystc as ls
+import specific_values as sv
 
 st.set_page_config(page_title="Curves with L-systems", page_icon="🖼️", layout="wide")
 
 
 @st.cache_data
 def load_result(axiom, mult_axiom, rules, rotation_angle, starting_angle, skipped, nb_iterations, coeff):
+    """
+    Return the result of the L-system with the specified parameters
+
+    :param axiom:
+    :param mult_axiom:
+    :param rules:
+    :param rotation_angle:
+    :param starting_angle:
+    :param skipped:
+    :param nb_iterations:
+    :param coeff:
+    :return: the result of the "L-System rendering"
+    """
     try:
         rules = rules.strip("; ")
         rules_list = []
@@ -39,7 +55,7 @@ def load_result(axiom, mult_axiom, rules, rotation_angle, starting_angle, skippe
         st.warning(f"Please verify your parameters - {ex}")
         st.stop()
     except Exception as ex:
-        st.warning(f"Please verify your parameters")
+        st.warning("Please verify your parameters")
         logger.error(f"Something went wrong : {ex}")
         st.stop()
     else:
@@ -47,6 +63,12 @@ def load_result(axiom, mult_axiom, rules, rotation_angle, starting_angle, skippe
 
 
 def write_specific(content):
+    """
+    Write streamlit content
+
+    :param content: streamlit content
+    :return: None
+    """
     try:
         st.write(content)
     except StreamlitAPIException as exc:
@@ -56,6 +78,11 @@ def write_specific(content):
 
 
 def on_change_selection():
+    """
+    Change the parameters when the starting example is changed
+
+    :return: None
+    """
     current_selection = st.session_state.my_selection
     axiom, mult_axiom, rules, rotation_angle, starting_angle, nb_iter, skipped, coeff = examples_data[current_selection]
     st.session_state.my_axiom = axiom
@@ -69,10 +96,10 @@ def on_change_selection():
     sv.redraw_auto = True
 
 
-with open("curves_parameters.yaml", 'r') as f:
+with open("curves_parameters.yaml", 'r', encoding='utf8') as f:
     curves_parameters = yaml.safe_load(f)
 
-examples_default = 0
+EXAMPLES_DEFAULT = 0
 examples_names = []
 examples_data = {}
 for c_name, c_params in curves_parameters.items():
@@ -89,23 +116,25 @@ for c_name, c_params in curves_parameters.items():
                              c_rotation_angle, c_starting_angle, c_nb_iter, c_skipped, c_coeff)
 
 
-examples_default_name = examples_names[examples_default]
-def_axiom, def_mult_axiom, def_rules, def_rotation_angle, def_starting_angle, def_nb_iter, def_skipped, def_coeff = examples_data[examples_default_name]
+EXAMPLES_DEFAULT_name = examples_names[EXAMPLES_DEFAULT]
+def_axiom, def_mult_axiom, def_rules, def_rotation_angle, def_starting_angle, def_nb_iter, def_skipped, def_coeff = \
+    examples_data[EXAMPLES_DEFAULT_name]
 
 with st.sidebar:
-    md_intro = """
+    MD_INTRO = """
     You have the flexibility to select a starting example and to change the parameters :sunglasses:
     """
 
-    st.markdown(md_intro)
+    st.markdown(MD_INTRO)
 
     input_selection = st.selectbox('Starting example', examples_names,
-                                   index=examples_default, on_change=on_change_selection, key="my_selection")
+                                   index=EXAMPLES_DEFAULT, on_change=on_change_selection, key="my_selection")
 
     input_axiom = st.text_input('Starting axiom', def_axiom, key="my_axiom")
     input_mult_axiom = st.number_input('Multiplier for axiom', value=def_mult_axiom, min_value=1, key="my_mult_axiom")
 
-    input_rules = st.text_input('Rules', def_rules, help="Example for 2 rules ->   A:  ABC ;  B:   CAB ; ", key="my_rules")
+    input_rules = st.text_input('Rules', def_rules, help="Example for 2 rules ->   A:  ABC ;  B:   CAB ; ",
+                                key="my_rules")
     input_rotation_angle = st.number_input('Angle of rotation',
                                            value=def_rotation_angle, min_value=1.0, max_value=360.0, step=1.0,
                                            format='%f', key="my_rotation_angle")

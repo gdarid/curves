@@ -8,10 +8,15 @@ See also
     https://onlinemathtools.com/l-system-generator
 """
 
+import io
 import math
+from bokeh.plotting import figure, show, output_file
+from bokeh.io import export_png, export_svgs
+from bokeh.io.export import get_screenshot_as_png
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import io
+import plotly.graph_objects as go
+import PIL.Image as pimage
 
 
 class Lsystc:
@@ -67,9 +72,9 @@ class Lsystc:
 
             if newpos is None:
                 break
-            else:
-                result = result[0:newpos] + result[newpos:].replace(rules[lreg][0], rules[lreg][1], 1)
-                position = newpos + len(rules[lreg][1])
+
+            result = result[0:newpos] + result[newpos:].replace(rules[lreg][0], rules[lreg][1], 1)
+            position = newpos + len(rules[lreg][1])
 
         return result
 
@@ -130,7 +135,7 @@ class Lsystc:
         result = self.axiom
 
         if self.rules:
-            for li in range(self.nbiter):
+            for _ in range(self.nbiter):
                 result = self.dev_unit(result, self.rules)
 
         self.dev = result
@@ -201,10 +206,10 @@ class Lsystc:
                     tx, ty = self.new_pos(tx, ty, ltstep, ltangle)
 
                 # npos true <-> new position with the pen down
-                npos = (car in self.char_move + self.char_move_multi + self.char_move_angle_init)
+                npos = car in self.char_move + self.char_move_multi + self.char_move_angle_init
 
                 # nliste true <-> new list because of a change of color or a raised pen
-                nliste = (car in self.char_color + self.char_move_lifted_pen)
+                nliste = car in self.char_color + self.char_move_lifted_pen
             elif car in self.char_move_up_3d or car in self.char_move_down_3d:
                 npos = True
                 self.dimension = 3
@@ -312,20 +317,16 @@ class Lsystc:
                 fig.savefig(f'{image_destination}plot_{show_type}.svg', bbox_inches='tight')
 
             if return_type == 'image':
-                from PIL import Image
-
                 fig.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0, hspace=0)
                 fig.canvas.draw()
 
-                # Return an image : PIL.Image.Image
-                return Image.frombytes('RGB', fig.canvas.get_width_height(), fig.canvas.tostring_rgb())
-            elif return_type == 'figure':
+                # Return an image : PIL.Image
+                return pimage.frombytes('RGB', fig.canvas.get_width_height(), fig.canvas.tostring_rgb())
+
+            if return_type == 'figure':
                 return fig
 
         elif show_type == 'bokeh':
-            from bokeh.plotting import figure, show, output_file
-            from bokeh.io import export_png, export_svgs
-
             if save_files:
                 output_file(f'{image_destination}lines_{show_type}.html')
 
@@ -348,29 +349,26 @@ class Lsystc:
                 export_svgs(fig, filename=f'{image_destination}plot_{show_type}.svg')
 
             if return_type == 'image':
-                from bokeh.io.export import get_screenshot_as_png
-
                 fig.toolbar_location = None
                 fig.axis.visible = False
                 fig.title = ""
 
-                # Return an image : PIL.Image.Image
+                # Return an image : PIL.Image
                 return get_screenshot_as_png(fig)
-            elif return_type == 'figure':
+
+            if return_type == 'figure':
                 return fig
 
         elif show_type == 'plotly':
-            import plotly.graph_objects as go
-
             fig = go.Figure()
 
-            axis_dict = dict(
-                showline=True,
-                showgrid=False,
-                showticklabels=True,
-                zeroline=False,
-                ticks='outside',
-            )
+            axis_dict = {
+                "showline": True,
+                "showgrid": False,
+                "showticklabels": True,
+                "zeroline": False,
+                "ticks": 'outside',
+            }
 
             index = 0
 
@@ -379,7 +377,7 @@ class Lsystc:
                     index += 1
                     cr, cg, cb = coul
                     fig.add_trace(go.Scatter(x=lx, y=ly, mode='lines',
-                                             name=f"t{index}", line=dict(color=f'rgb({cr},{cg},{cb})', width=1)))
+                                             name=f"t{index}", line={"color": f'rgb({cr},{cg},{cb})', "width": 1}))
 
             else:
                 # 3D
@@ -387,7 +385,7 @@ class Lsystc:
                     index += 1
                     cr, cg, cb = coul
                     fig.add_trace(go.Scatter3d(x=lx, y=ly, z=lz, mode='lines',
-                                               name=f"t{index}", line=dict(color=f'rgb({cr},{cg},{cb})', width=1)))
+                                               name=f"t{index}", line={"color": f'rgb({cr},{cg},{cb})', "width": 1}))
 
             fig.update_layout(
                 xaxis=axis_dict,
@@ -404,14 +402,13 @@ class Lsystc:
                 fig.write_image(f'{image_destination}plot_{show_type}.svg')
 
             if return_type == 'image':
-                from PIL import Image
-
                 fig_bytes = fig.to_image(format="png")
                 buf = io.BytesIO(fig_bytes)
 
-                # Return an image : PIL.Image.Image
-                return Image.open(buf)
-            elif return_type == 'figure':
+                # Return an image : PIL.Image
+                return pimage.open(buf)
+
+            if return_type == 'figure':
                 return fig
 
         else:
