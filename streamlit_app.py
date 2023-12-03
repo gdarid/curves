@@ -29,6 +29,7 @@ def load_result(axiom, mult_axiom, rules, rotation_angle, starting_angle, skippe
     :return: the result of the "L-System rendering"
     """
     try:
+        config = ls.Config(skipped=skipped)
         rules = rules.strip("; ")
         rules_list = []
 
@@ -45,8 +46,8 @@ def load_result(axiom, mult_axiom, rules, rotation_angle, starting_angle, skippe
                 else:
                     raise ValueError(f"Every non empty rule must include a column character ( {item} ) ")
 
-        rls = ls.Lsystc(axiom * mult_axiom, rules_list, nbiter=nb_iterations)
-        rls.turtle(step=sv.step, angle=rotation_angle, angleinit=starting_angle, coeff=coeff, skipped=skipped,
+        rls = ls.Lsystc(config, axiom * mult_axiom, rules_list, nbiter=nb_iterations, verbose=sv.verbose)
+        rls.turtle(step=sv.step, angle=rotation_angle, angleinit=starting_angle, coeff=coeff,
                    color_length=sv.color_length, color_map=sv.color_map)
 
         result = rls.render(sv.renderer, save_files=sv.save_files, show_more=sv.show_more, show_3d=sv.show_3d,
@@ -56,7 +57,8 @@ def load_result(axiom, mult_axiom, rules, rotation_angle, starting_angle, skippe
         st.stop()
     except Exception as ex:
         st.warning("Please verify your parameters")
-        logger.error(f"Something went wrong : {ex}")
+        if sv.verbose:
+            logger.error(f"Something went wrong : {ex}")
         st.stop()
     else:
         return result

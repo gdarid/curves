@@ -7,7 +7,7 @@ import pytest
     ('AB', [('A', 'AB'), ('B', 'BB')], 'ABBB'),
 ])
 def test_single_iteration(axiom, rules, expected_result):
-    syst = ls.Lsystc(axiom, rules, nbiter=1)
+    syst = ls.Lsystc(ls.Config(), axiom, rules, nbiter=1)
     assert syst.dev == expected_result
 
 
@@ -16,7 +16,7 @@ def test_single_iteration(axiom, rules, expected_result):
     ('AB', [('A', 'AB'), ('B', 'BB')], 3, 'ABBBBBBBBBBBBBBB'),
 ])
 def test_more_iterations(axiom, rules, nbiterations, expected_result):
-    syst = ls.Lsystc(axiom, rules, nbiter=nbiterations)
+    syst = ls.Lsystc(ls.Config(), axiom, rules, nbiter=nbiterations)
     assert syst.dev == expected_result
 
 
@@ -25,7 +25,7 @@ def test_more_iterations(axiom, rules, nbiterations, expected_result):
     ('F+F', [([0, 10, 10], [0, 0, 10], [0, 0, 0], (228, 26, 28))]),
 ])
 def test_turt(axiom, expected_result):
-    syst = ls.Lsystc(axiom, [], nbiter=1)
+    syst = ls.Lsystc(ls.Config(), axiom, [], nbiter=1)
     syst.turtle()
     assert syst.turt == expected_result
 
@@ -35,7 +35,7 @@ def test_turt(axiom, expected_result):
     ('⇩F', [([0, 0, 10], [0, 0, 0], [0, -10, -10], (228, 26, 28))]),
 ])
 def test_turt_3d(axiom, expected_result):
-    syst = ls.Lsystc(axiom, [], nbiter=1)
+    syst = ls.Lsystc(ls.Config(), axiom, [], nbiter=1)
     syst.turtle()
     assert syst.turt == expected_result
 
@@ -45,6 +45,6 @@ def test_turt_3d(axiom, expected_result):
     ('vF', [([0, 9.9], [0, 0], [0, 0], (228, 26, 28))]),
 ])
 def test_turt_delta(axiom, expected_result):
-    syst = ls.Lsystc(axiom, [], nbiter=1)
+    syst = ls.Lsystc(ls.Config(), axiom, [], nbiter=1)
     syst.turtle()
     assert syst.turt == expected_result

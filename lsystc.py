@@ -10,46 +10,72 @@ See also
 
 import io
 import math
+import attrs as at
 from bokeh.plotting import figure, show, output_file
 from bokeh.io import export_png, export_svgs
 from bokeh.io.export import get_screenshot_as_png
+from loguru import logger
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import PIL.Image as pimage
 
 
+@at.define
+class Config:  # pylint: disable=too-few-public-methods
+    """
+    Configuration of the important active characters
+    """
+    reserved: str = ':; '  # reserved characters
+
+    color: str = '.'
+    move_lifted_pen: str = 'UVW'
+    move_angle_init: str = '_'
+    move: str = 'ABCDEFGHIJKLMNOPQRST'
+
+    move_up_3d: str = '⇧'
+    move_down_3d: str = '⇩'
+
+    move_multi: str = at.field(init=False)
+    move_all: str = at.field(init=False)
+
+    delta_add: str = 'u'
+    delta_sub: str = 'v'
+
+    skipped: str = ''
+    total_skipped: str = at.field(init=False)  # all skipped characters
+
+    def __attrs_post_init__(self):
+        self.move_multi = self.move.lower()
+        self.move_all = self.color + self.move_lifted_pen + self.move_angle_init + self.move_multi + self.move
+        self.total_skipped = ' ' + self.skipped
+
+
 class Lsystc:
     """
     Classic L-System with few customizations
     """
-    def __init__(self, axiom: str, rules: list[tuple[str, str]], nbiter: int, dev_ini: bool = True) -> None:
+    def __init__(self, config: Config, axiom: str, rules: list[tuple[str, str]], nbiter: int,
+                 dev_ini: bool = True, verbose: bool = False) -> None:
+        self.config = config
         self.axiom = axiom
         self.rules = rules
         self.nbiter = nbiter
         self.dev_ini = dev_ini
+        self.verbose = verbose
 
         self.dev = ''
         self.turt = []
 
-        self.reserved = ':; '  # reserved characters
-        self.default_skipped = ' '
-
-        self.char_color = '.'
-        self.char_move_lifted_pen = 'UVW'
-        self.char_move_angle_init = '_'
-        self.char_move = 'ABCDEFGHIJKLMNOPQRST'
-        self.char_move_multi = self.char_move.lower()
-        self.char_move_all = (self.char_color + self.char_move_lifted_pen + self.char_move_angle_init +
-                              self.char_move_multi + self.char_move)
-
-        self.char_move_up_3d = '⇧'
-        self.char_move_down_3d = '⇩'
-
         self.dimension = 2
 
-        if dev_ini:
+        if self.verbose:
+            logger.info(f"Axiom: {self.axiom:.50} ; Rules : {self.rules} ; Nb iterations : {self.nbiter}")
+
+        if self.dev_ini:
             self.develop()
+            if self.verbose:
+                logger.info(f"Axiom: {self.axiom:.50} ; Rules : {self.rules} ; Nb iterations : {self.nbiter} ; After")
 
     @staticmethod
     def dev_unit(source: str, rules: list[tuple[str, str]]) -> str:
@@ -141,8 +167,8 @@ class Lsystc:
         self.dev = result
 
     def turtle(self, step: float = 10.0, angle: float = 90.0, angleinit: float = 0.0, coeff: float = 1.1,
-               angle2: float = 10.0, skipped: str = '', color_length: int = 3, color_map: str = "Set1",
-               delta: float = 0.1, char_delta_add: str = 'u', char_delta_sub: str = 'v') -> None:
+               angle2: float = 10.0, color_length: int = 3, color_map: str = "Set1",
+               delta: float = 0.1) -> None:
         """
         Develop self.dev in [(lx, ly, lz, color),...] where lx, ly, lz are lists of positions
         The result goes to self.turt
@@ -152,18 +178,10 @@ class Lsystc:
         :param angleinit: initial angle
         :param coeff: magnification or reduction factor for the step ( * / ) and factor for "lowered" characters
         :param angle2: 2nd usable angle ( < > )
-        :param skipped: skipped characters
         :param color_length: maximal number of colours
         :param color_map: color map to use (matplotlib name)
         :param delta: value to add to the step
-        :param char_delta_add: characters to add the delta value to the step
-        :param char_delta_sub: characters to subtract the delta value to the step
         """
-        if skipped:
-            skipped = skipped + self.default_skipped
-        else:
-            skipped = self.default_skipped
-
         res = []
         stock = []  # List of ("point", angle) kept for [] et ()
 
@@ -182,7 +200,7 @@ class Lsystc:
 
         for car in self.dev:
 
-            if car in skipped:
+            if car in self.config.total_skipped:
                 continue
 
             npos = False
@@ -190,15 +208,15 @@ class Lsystc:
             nliste = False
             ncolor = False
 
-            if car in self.char_move_all:
-                if car in self.char_color:
+            if car in self.config.move_all:
+                if car in self.config.color:
                     ncolor = True
                 else:
                     ltstep = tstep
 
-                    if car in self.char_move_multi:
+                    if car in self.config.move_multi:
                         ltstep = tstep * coeff
-                    elif car in self.char_move_angle_init:
+                    elif car in self.config.move_angle_init:
                         tangle = angleinit
 
                     ltangle = tangle
@@ -206,14 +224,14 @@ class Lsystc:
                     tx, ty = self.new_pos(tx, ty, ltstep, ltangle)
 
                 # npos true <-> new position with the pen down
-                npos = car in self.char_move + self.char_move_multi + self.char_move_angle_init
+                npos = car in self.config.move + self.config.move_multi + self.config.move_angle_init
 
                 # nliste true <-> new list because of a change of color or a raised pen
-                nliste = car in self.char_color + self.char_move_lifted_pen
-            elif car in self.char_move_up_3d or car in self.char_move_down_3d:
+                nliste = car in self.config.color + self.config.move_lifted_pen
+            elif car in self.config.move_up_3d or car in self.config.move_down_3d:
                 npos = True
                 self.dimension = 3
-                if car in self.char_move_up_3d:
+                if car in self.config.move_up_3d:
                     tz += tstep
                 else:
                     tz -= tstep
@@ -229,9 +247,9 @@ class Lsystc:
                 tstep *= coeff
             elif car == '/':
                 tstep /= coeff
-            elif car in char_delta_add:
+            elif car in self.config.delta_add:
                 tstep += delta
-            elif car in char_delta_sub:
+            elif car in self.config.delta_sub:
                 tstep -= delta
             elif car in '[(':
                 stock.append((tx, ty, tz, tangle, tcouleur, tstep))

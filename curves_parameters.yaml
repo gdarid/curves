@@ -52,7 +52,7 @@ Peano:
 
 Penrose tiling:
     axiom: "[N]++[N]++[N]++[N]++[N]"
-    rules: "M:O++P----N[-O----M]++ ; N:+O--P[---M--N]+ ; O:-M++N[+++O++P]- ; P:--O++++M[+P++++N]--N"
+    rules: "A:O++B----N[-O----A]++ ; N:+O--B[---A--N]+ ; O:-A++N[+++O++B]- ; B:--O++++A[+B++++N]--N"
     rotation_angle: 36.0
     nb_iter: 5
 

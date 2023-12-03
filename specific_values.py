@@ -25,6 +25,6 @@ if (renderer, return_type) not in [('matplot', 'image'), ('matplot', 'figure'),
     raise NotImplementedError("The current combination of renderer and return_type is not implemented")
 
 save_files = False
-verbose = False
+verbose = False    # Set to true to see more logs
 show_more = False  # Set to true to see more details "locally"
 show_3d = False
