@@ -173,3 +173,9 @@ Triangle with spiral:
 
     axiom_multiplier: 500
     coeff: 0.94
+
+3D example:
+    axiom: "F+F+F .MFM. F+F+F"
+    rules: ""
+    rotation_angle: 90.0
+    nb_iter: 1

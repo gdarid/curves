@@ -58,7 +58,7 @@ def load_result(axiom, mult_axiom, rules, rotation_angle, starting_angle, skippe
     except Exception as ex:
         st.warning("Please verify your parameters")
         if sv.verbose:
-            logger.error(f"Something went wrong : {ex}")
+            logger.exception(f"Something went wrong : {ex}")
         st.stop()
     else:
         return result

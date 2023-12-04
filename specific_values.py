@@ -27,4 +27,4 @@ if (renderer, return_type) not in [('matplot', 'image'), ('matplot', 'figure'),
 save_files = False
 verbose = False    # Set to true to see more logs
 show_more = False  # Set to true to see more details "locally"
-show_3d = False
+show_3d = True

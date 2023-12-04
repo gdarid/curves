@@ -8,5 +8,6 @@ numpy
 Pillow
 plotly
 pyyaml
+scipy
 selenium
 streamlit
