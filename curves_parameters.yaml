@@ -179,3 +179,11 @@ Triangle with spiral:
     rules: ""
     rotation_angle: 90.0
     nb_iter: 1
+
+3D spring:
+    axiom: "F+P."
+    rules: ""
+    rotation_angle: 10.0
+    nb_iter: 1
+
+    axiom_multiplier: 500
