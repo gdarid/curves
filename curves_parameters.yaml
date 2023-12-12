@@ -110,6 +110,12 @@ Returns with angle 5 degrees:
 
     axiom_multiplier: 72
 
+Round star:
+    axiom: "F"
+    rules: "F:F+.+F"
+    rotation_angle: 77.0
+    nb_iter: 7
+
 Sierpinsky carpet:
     axiom: "A"
     rules: "A:B-A-B.  ;  B:A+B+A."
