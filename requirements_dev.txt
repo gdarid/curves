@@ -1,2 +1,5 @@
+mypy
 pylint
 pytest
+types-Pillow
+types-PyYAML
