@@ -164,8 +164,16 @@ Squigly:
     nb_iter: 9
 
 Tree:
+    axiom: "B"
+    rules:  "A: AA; B: A[-B][+B]"
+    rotation_angle: 20.0
+    nb_iter: 5
+
+    starting_angle: 90
+
+Tree 2:
     axiom: "F"
-    rules: "F: F[.+FF][.-FF]F[.-F][.+F]F "
+    rules: "F: F[.+FF][.-FF]F[.-F][.+F]F"
     rotation_angle: 36.0
     nb_iter: 3
 

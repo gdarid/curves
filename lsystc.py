@@ -89,7 +89,8 @@ class Lsystc:
 
         if self.dev_ini:
             self.develop()
-            self.log('info', f"Axiom: {self.axiom:.50} ; Rules : {self.rules} ; Nb iterations : {self.nbiter} ; After")
+            self.log('info', f"Axiom: {self.axiom:.50} ; Rules : {self.rules} ; "
+                             f"Nb iterations : {self.nbiter} Expanded value : {self.dev[:50]+'...'} ; After")
 
     @staticmethod
     def apply_rot(rot: Rotation, vec: np.array) -> np.array:
