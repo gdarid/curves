@@ -10,6 +10,7 @@ See also
 
 import io
 import math
+from collections import deque
 from bokeh.plotting import figure, show, output_file
 from bokeh.io import export_png, export_svgs
 from bokeh.io.export import get_screenshot_as_png
@@ -51,6 +52,9 @@ class Config:  # pylint: disable=too-few-public-methods
 
     delta_add: str = 'u'
     delta_sub: str = 'v'
+
+    outer_repetition: str = '#'
+    outer_repetition_max: int = 100
 
     skipped: str = ''
     total_skipped: str = at.field(init=False)  # all skipped characters
@@ -298,9 +302,9 @@ class Lsystc:
         res = []
         stock: list = []  # List of ("point", angle, ...) kept for [] et ()
 
-        lix = [0.0]
-        liy = [0.0]
-        liz = [0.0]
+        lix: list[float] = []
+        liy: list[float] = []
+        liz: list[float] = []
 
         tx = 0.0
         ty = 0.0
@@ -311,119 +315,136 @@ class Lsystc:
         color_index = 0
         tcouleur = self.color_from_map(color_map, color_index)
 
-        for car in self.dev:
+        nb_iterations: int = 0
+        stock_outer: deque = deque([(tx, ty, tz, tangle, tcouleur, tstep, self.mobile_vectors)])
 
-            if car in self.config.total_skipped:
-                continue
+        while stock_outer:
+            nb_iterations += 1
+            if len(lix) > 1:
+                res.append((lix, liy, liz, tcouleur))
 
-            npos = False
-            npospos = False
-            nliste = False
-            ncolor = False
+            tx, ty, tz, tangle, tcouleur, tstep, self.mobile_vectors = stock_outer.popleft()
+            lix = [tx]
+            liy = [ty]
+            liz = [tz]
 
-            if car in self.config.move_all:
-                if car in self.config.color:
-                    ncolor = True  # Change of color
-                else:
-                    ltstep = tstep
+            for car in self.dev:
 
-                    if car in self.config.move_multi:
-                        ltstep = tstep * coeff
-                    elif car in self.config.move_angle_init:
-                        tangle = angleinit
+                if car in self.config.total_skipped:
+                    continue
 
-                    ltangle = tangle
+                npos = False
+                npospos = False
+                nliste = False
+                ncolor = False
 
-                    tx, ty, tz = self.new_pos(tx, ty, tz, ltstep, ltangle)
-
-                # npos true <-> new position with the pen down
-                npos = car in self.config.move + self.config.move_multi + self.config.move_angle_init
-
-                # nliste true <-> new list because of a change of color or a raised pen
-                nliste = car in self.config.color + self.config.move_lifted_pen
-            elif car in self.config.move_up_3d or car in self.config.move_down_3d:
-                npos = True
-                self.dimension = 3
-                if car in self.config.move_up_3d:
-                    tz += tstep
-                else:
-                    tz -= tstep
-            elif car in '+-><' + self.config.r3d_all:
-                if self.rotation_3d_done:
-                    if car in '+-' + self.config.r3d_all:
-                        langle = angle
+                if car in self.config.move_all:
+                    if car in self.config.color:
+                        ncolor = True  # Change of color
                     else:
-                        langle = angle2
+                        ltstep = tstep
 
-                    self.rotate_3d(car, langle * tsens)
-                else:
-                    if car in '+':
-                        tangle = (tangle + angle * tsens) % 360.0
-                    elif car in '-':
-                        tangle = (tangle - angle * tsens) % 360.0
-                    elif car in '>':
-                        tangle = (tangle + angle2 * tsens) % 360.0
-                    elif car in '<':
-                        tangle = (tangle - angle2 * tsens) % 360.0
+                        if car in self.config.move_multi:
+                            ltstep = tstep * coeff
+                        elif car in self.config.move_angle_init:
+                            tangle = angleinit
+
+                        ltangle = tangle
+
+                        tx, ty, tz = self.new_pos(tx, ty, tz, ltstep, ltangle)
+
+                    # npos true <-> new position with the pen down
+                    npos = car in self.config.move + self.config.move_multi + self.config.move_angle_init
+
+                    # nliste true <-> new list because of a change of color or a raised pen
+                    nliste = car in self.config.color + self.config.move_lifted_pen
+                elif car in self.config.move_up_3d or car in self.config.move_down_3d:
+                    npos = True
+                    self.dimension = 3
+                    if car in self.config.move_up_3d:
+                        tz += tstep
                     else:
-                        # There is a not trivial 3D rotation ( PMpm )
-                        self.init_3d(tangle)
-                        self.rotate_3d(car, angle * tsens)
+                        tz -= tstep
+                elif car in '+-><' + self.config.r3d_all:
+                    if self.rotation_3d_done:
+                        if car in '+-' + self.config.r3d_all:
+                            langle = angle
+                        else:
+                            langle = angle2
 
-            elif car == '*':
-                tstep *= coeff
-            elif car == '/':
-                tstep /= coeff
-            elif car in self.config.delta_add:
-                tstep += delta
-            elif car in self.config.delta_sub:
-                tstep -= delta
-            elif car in '[(':
-                stock.append((tx, ty, tz, tangle, tcouleur, tstep, self.mobile_vectors))
-            elif car in '])':
-                if stock:
-                    tx, ty, tz, tangle, tcouleur, tstep, self.mobile_vectors = stock.pop()
-                    nliste = True  # the pen is raised to go back to the stocked position
-            elif car == '|':
-                # Single "return" ("round-trip")
-                npospos = True
-            elif car == '!':
-                # Change the sens of rotation
-                tsens = tsens * -1
-            else:
-                continue
+                        self.rotate_3d(car, langle * tsens)
+                    else:
+                        if car in '+':
+                            tangle = (tangle + angle * tsens) % 360.0
+                        elif car in '-':
+                            tangle = (tangle - angle * tsens) % 360.0
+                        elif car in '>':
+                            tangle = (tangle + angle2 * tsens) % 360.0
+                        elif car in '<':
+                            tangle = (tangle - angle2 * tsens) % 360.0
+                        else:
+                            # There is a not trivial 3D rotation ( PMpm )
+                            self.init_3d(tangle)
+                            self.rotate_3d(car, angle * tsens)
 
-            # Take into account the read character
-            # ------------------------------------
-            if nliste:
-                # New list because of new color or lifted pen
-                if len(lix) > 1:
-                    res.append((lix, liy, liz, tcouleur))
+                elif car == '*':
+                    tstep *= coeff
+                elif car == '/':
+                    tstep /= coeff
+                elif car in self.config.delta_add:
+                    tstep += delta
+                elif car in self.config.delta_sub:
+                    tstep -= delta
+                elif car in '[(':
+                    stock.append((tx, ty, tz, tangle, tcouleur, tstep, self.mobile_vectors))
+                elif car in '])':
+                    if stock:
+                        tx, ty, tz, tangle, tcouleur, tstep, self.mobile_vectors = stock.pop()
+                        nliste = True  # the pen is raised to go back to the stocked position
+                elif car == '|':
+                    # Single "return" ("round-trip")
+                    npospos = True
+                elif car == '!':
+                    # Change the sens of rotation
+                    tsens = tsens * -1
+                elif car in self.config.outer_repetition:
+                    # A new possible item in the "outer stock"
+                    if nb_iterations <= self.config.outer_repetition_max:
+                        stock_outer.append((tx, ty, tz, tangle, tcouleur, tstep, self.mobile_vectors))
+                else:
+                    continue
 
-                if ncolor:
-                    # Change of color
-                    color_index = (color_index + 1) % color_length
-                    tcouleur = self.color_from_map(color_map, color_index)
+                # Take into account the read character
+                # ------------------------------------
+                if nliste:
+                    # New list because of new color or lifted pen
+                    if len(lix) > 1:
+                        res.append((lix, liy, liz, tcouleur))
 
-                lix = [tx]
-                liy = [ty]
-                liz = [tz]
-            elif npos:
-                # New position and no new list
-                lix.append(tx)
-                liy.append(ty)
-                liz.append(tz)
-            elif npospos:
-                # 2 new positions for a "round-trip"
-                tnx, tny, tnz = self.new_pos(tx, ty, tz, tstep, tangle)
+                    if ncolor:
+                        # Change of color
+                        color_index = (color_index + 1) % color_length
+                        tcouleur = self.color_from_map(color_map, color_index)
 
-                lix.append(tnx)
-                liy.append(tny)
-                liz.append(tnz)
+                    lix = [tx]
+                    liy = [ty]
+                    liz = [tz]
+                elif npos:
+                    # New position and no new list
+                    lix.append(tx)
+                    liy.append(ty)
+                    liz.append(tz)
+                elif npospos:
+                    # 2 new positions for a "round-trip"
+                    tnx, tny, tnz = self.new_pos(tx, ty, tz, tstep, tangle)
 
-                lix.append(tx)
-                liy.append(ty)
-                liz.append(tz)
+                    lix.append(tnx)
+                    liy.append(tny)
+                    liz.append(tnz)
+
+                    lix.append(tx)
+                    liy.append(ty)
+                    liz.append(tz)
 
         if len(lix) > 1:
             # Finally, append the last points
@@ -519,6 +540,10 @@ class Lsystc:
             index = 0
 
             if self.dimension == 2 or not show_3d:
+                fig.update_yaxes(
+                    scaleanchor="x",
+                    scaleratio=1,
+                )
                 for (lx, ly, lz, coul) in self.turt:
                     index += 1
                     cr, cg, cb = coul
