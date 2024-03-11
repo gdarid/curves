@@ -3,3 +3,6 @@ disableWidgetStateDuplicationWarning = true
 
 [theme]
 base="dark"
+
+[browser]
+gatherUsageStats = false

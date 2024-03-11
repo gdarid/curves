@@ -1,0 +1,12 @@
+# .dockerignore
+
+.git
+.*cache
+*pycache*
+
+_tmp
+
+images_out/*.html
+images_out/*.png
+images_out/*.svg
+
