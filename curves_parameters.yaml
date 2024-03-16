@@ -102,10 +102,26 @@ Polygon 9*5:
 
     axiom_multiplier: 9
 
-Repetition:
+Repetition 3:
     axiom: "F#+F#+F#"
     rules: ""
     rotation_angle: 120.0
+    nb_iter: 1
+
+    axiom_multiplier: 1
+
+Repetition 5:
+    axiom: "F#+F#+F#+F#+F#"
+    rules: ""
+    rotation_angle: 72.0
+    nb_iter: 1
+
+    axiom_multiplier: 1
+
+Repetition 6:
+    axiom: "F#+F#+F#+F#+F#+F#"
+    rules: ""
+    rotation_angle: 60.0
     nb_iter: 1
 
     axiom_multiplier: 1
